@@ -733,40 +733,7 @@ const struct mime_conv_t* p = &mimeLookup[0];
     return BAD_VALUE;
 }
 
-struct aac_format_conv_t {
-    OMX_AUDIO_AACPROFILETYPE eAacProfileType;
-    audio_format_t format;
-};
-
-static const struct aac_format_conv_t profileLookup[] = {
-    { OMX_AUDIO_AACObjectMain,        AUDIO_FORMAT_AAC_MAIN},
-    { OMX_AUDIO_AACObjectLC,          AUDIO_FORMAT_AAC_LC},
-    { OMX_AUDIO_AACObjectSSR,         AUDIO_FORMAT_AAC_SSR},
-    { OMX_AUDIO_AACObjectLTP,         AUDIO_FORMAT_AAC_LTP},
-    { OMX_AUDIO_AACObjectHE,          AUDIO_FORMAT_AAC_HE_V1},
-    { OMX_AUDIO_AACObjectScalable,    AUDIO_FORMAT_AAC_SCALABLE},
-    { OMX_AUDIO_AACObjectERLC,        AUDIO_FORMAT_AAC_ERLC},
-    { OMX_AUDIO_AACObjectLD,          AUDIO_FORMAT_AAC_LD},
-    { OMX_AUDIO_AACObjectHE_PS,       AUDIO_FORMAT_AAC_HE_V2},
-    { OMX_AUDIO_AACObjectELD,         AUDIO_FORMAT_AAC_ELD},
-    { OMX_AUDIO_AACObjectNull,        AUDIO_FORMAT_AAC},
-};
-
-void mapAACProfileToAudioFormat( audio_format_t& format, uint64_t eAacProfile)
-{
-const struct aac_format_conv_t* p = &profileLookup[0];
-    while (p->eAacProfileType != OMX_AUDIO_AACObjectNull) {
-        if (eAacProfile == p->eAacProfileType) {
-            format = p->format;
-            return;
-        }
-        ++p;
-    }
-    format = AUDIO_FORMAT_AAC;
-    return;
-}
-
-bool canOffloadStream(const sp<MetaData>& meta, bool hasVideo, const sp<MetaData>& vMeta,
+bool canOffloadStream(const sp<MetaData>& meta, bool hasVideo,
                       bool isStreaming, audio_stream_type_t streamType)
 {
     const char *mime;
@@ -774,17 +741,6 @@ bool canOffloadStream(const sp<MetaData>& meta, bool hasVideo, const sp<MetaData
         return false;
     }
     CHECK(meta->findCString(kKeyMIMEType, &mime));
-
-    if (hasVideo) {
-        const char *vMime;
-        CHECK(vMeta->findCString(kKeyMIMEType, &vMime));
-#ifdef ENABLE_AV_ENHANCEMENTS
-        if (!strncmp(vMime, MEDIA_MIMETYPE_VIDEO_HEVC, strlen(MEDIA_MIMETYPE_VIDEO_HEVC))) {
-            ALOGD("Do not offload HEVC audio+video playback");
-            return false;
-        }
-#endif
-    }
 
     audio_offload_info_t info = AUDIO_INFO_INITIALIZER;
 

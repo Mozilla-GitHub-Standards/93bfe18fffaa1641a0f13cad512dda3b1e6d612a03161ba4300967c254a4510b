@@ -1698,12 +1698,6 @@ status_t AwesomePlayer::initAudioDecoder() {
     ATRACE_CALL();
 
     sp<MetaData> meta = mAudioTrack->getFormat();
-    sp<MetaData> vMeta;
-    status_t err;
-    if (mVideoTrack != NULL && mVideoSource != NULL) {
-        vMeta = mVideoTrack->getFormat();
-    }
-
     const char *mime;
     CHECK(meta->findCString(kKeyMIMEType, &mime));
     // Check whether there is a hardware codec for this stream
@@ -1715,7 +1709,7 @@ status_t AwesomePlayer::initAudioDecoder() {
         streamType = mAudioSink->getAudioStreamType();
     }
 
-    mOffloadAudio = canOffloadStream(meta, (mVideoSource != NULL), vMeta,
+    mOffloadAudio = canOffloadStream(meta, (mVideoSource != NULL),
                                      (isStreamingHTTP() || isWidevineContent()),
                                      streamType);
 
@@ -1754,8 +1748,9 @@ status_t AwesomePlayer::initAudioDecoder() {
         if (durationUs >= 0) {
             format->setInt64(kKeyDuration, durationUs);
         }
-        mOffloadAudio = canOffloadStream(format, (mVideoSource != NULL), vMeta,
-                                     (isStreamingHTTP() || isWidevineContent()), streamType);
+        mOffloadAudio = canOffloadStream(format, (mVideoSource != NULL),
+                                    (isStreamingHTTP() || isWidevineContent()),
+                                     streamType);
     }
 
     if (mAudioSource != NULL) {
