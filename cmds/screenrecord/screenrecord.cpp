@@ -63,7 +63,7 @@ static uint32_t gBitRate = 4000000;         // 4Mbps
 static uint32_t gTimeLimitSec = kMaxTimeLimitSec;
 
 // Set by signal handler to stop recording.
-static bool gStopRequested;
+static volatile bool gStopRequested;
 
 // Previous signal handler state, restored after first hit.
 static struct sigaction gOrigSigactionINT;
