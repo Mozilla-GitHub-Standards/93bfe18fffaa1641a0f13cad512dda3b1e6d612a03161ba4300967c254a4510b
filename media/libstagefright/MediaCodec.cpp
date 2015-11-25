@@ -67,7 +67,7 @@ MediaCodec::BatteryNotifier::BatteryNotifier() :
     const sp<IServiceManager> sm(defaultServiceManager());
     if (sm != NULL) {
         const String16 name("batterystats");
-        mBatteryStatService = interface_cast<IBatteryStats>(sm->getService(name));
+        mBatteryStatService = interface_cast<IBatteryStats>(sm->checkService(name));
         if (mBatteryStatService == NULL) {
             ALOGE("batterystats service unavailable!");
         }
@@ -2279,6 +2279,15 @@ void MediaCodec::updateBatteryStat() {
 
         mBatteryStatNotified = false;
     }
+}
+
+sp<GraphicBuffer> MediaCodec::getOutputGraphicBufferFromIndex(size_t index) {
+
+    if (mState != STARTED || index >= mPortBuffers[kPortIndexOutput].size()) {
+        return NULL;
+    }
+
+    return mCodec->mBuffers[kPortIndexOutput].editItemAt(index).mGraphicBuffer;
 }
 
 }  // namespace android
