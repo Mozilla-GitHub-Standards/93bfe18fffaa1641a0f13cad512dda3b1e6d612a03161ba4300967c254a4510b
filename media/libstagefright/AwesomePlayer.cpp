@@ -1766,7 +1766,7 @@ status_t AwesomePlayer::initAudioDecoder() {
         tempMetadata = ExtendedUtils::updatePCMFormatAndBitwidth(mAudioSource,
                                                                 mOffloadAudio);
     }
-    err = mAudioSource->start(tempMetadata.get());
+    status_t err = mAudioSource->start(tempMetadata.get());
     tempMetadata.clear();
 
     if (err != OK) {
